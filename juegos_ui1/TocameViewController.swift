@@ -15,7 +15,7 @@ class TocameViewController: UIViewController {
 
         
     var countdownTimer: Timer?
-    var restante = 10
+    var restante = 20
     var contador = 0
     var circle: UIView!
     var nombre: String?
@@ -35,7 +35,7 @@ class TocameViewController: UIViewController {
 
     func setup() {
         let circleSize: CGFloat = 50
-        circle = UIView(frame: CGRect(x: 100, y: 100, width: circleSize, height: circleSize))
+        circle = UIView(frame: CGRect(x: 200, y: 200, width: circleSize, height: circleSize))
         circle.backgroundColor = .systemPurple
         circle.layer.cornerRadius = circleSize / 2
         circle.clipsToBounds = true
@@ -101,7 +101,7 @@ class TocameViewController: UIViewController {
         countdownTimer?.invalidate()
 
         contador = 0
-        restante = 10
+        restante = 20
         etiScore.text = "0"
         etiTimer.text = "\(restante)"
 

@@ -12,7 +12,6 @@ class HomeViewController: UIViewController {
     
     
     @IBOutlet weak var txtfldPick: UITextField!
-    @IBOutlet weak var user1: UITextField!
     @IBOutlet weak var user2: UITextField!
     
     
@@ -33,27 +32,27 @@ class HomeViewController: UIViewController {
         txtfldPick.textAlignment = .center
         txtfldPick.clearButtonMode = .whileEditing
         
-        user1.clearButtonMode = .whileEditing
         user2.clearButtonMode = .whileEditing
+        user2.isHidden = true
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
-            view.addGestureRecognizer(tap)
+        view.addGestureRecognizer(tap)
         
         let toolbar = UIToolbar()
         toolbar.sizeToFit()
-
+        
         let doneButton = UIBarButtonItem(title: "Listo", style: .plain, target: self, action: #selector(pickerListo))
         let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-
+        
         toolbar.setItems([flexSpace, doneButton], animated: false)
         txtfldPick.inputAccessoryView = toolbar
-
+        
     }
     
     @objc func dismissKeyboard() {
         self.view.endEditing(true)
     }
-
+    
     
     func navegar() {
         guard let juego = txtfldPick.text, !juego.isEmpty else { return }
@@ -62,19 +61,17 @@ class HomeViewController: UIViewController {
             guard let secondVC = storyboard?.instantiateViewController(withIdentifier: "SecondViewController") as? PokerViewController else {
                 return
             }
-            
-            secondVC.nombre1 = user1.text
+            user2.isHidden = false
             secondVC.nombre2 = user2.text
             secondVC.juegoSeleccionado = juego
-            navigationController?.pushViewController(secondVC, animated: true)
+            present(secondVC, animated: true, completion: nil)
         } else if txtfldPick.text == "Tocame" {
             guard let thirdVC = storyboard?.instantiateViewController(withIdentifier: "ThirdViewController") as? TocameViewController else {
                 return
             }
             user2.isHidden = true
-            thirdVC.nombre = user1.text
             thirdVC.juegoSeleccionado = juego
-            navigationController?.pushViewController(thirdVC, animated: true)
+            present(thirdVC, animated: true, completion: nil)
         }
     }
     
@@ -84,22 +81,22 @@ class HomeViewController: UIViewController {
         txtfldPick.text = selectedJuego
         juegoSeleccionado = selectedJuego
         txtfldPick.resignFirstResponder()
-
+        
         if selectedJuego == "Tocame" {
             user2.isHidden = true
-            
             UIView.animate(withDuration: 0.3) {
-                self.selectJuego.frame.origin.y -= 100
+//                self.selectJuego.frame.origin.y -= 100
             }
         } else {
             user2.isHidden = false
-            
             UIView.animate(withDuration: 0.3) {
                 self.selectJuego.frame.origin.y += 100
             }
         }
     }
+
 }
+    
 
 extension HomeViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     

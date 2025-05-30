@@ -80,7 +80,7 @@ class PokerViewController: UIViewController {
             }
             
             
-            eti1.text = nombre1
+//            eti1.text = nombre1
             eti2.text = nombre2
             func mostrarGanador(titulo: String, mensaje: String) {
                 let alerta = UIAlertController(title: titulo, message: mensaje, preferredStyle: .alert)
@@ -90,7 +90,7 @@ class PokerViewController: UIViewController {
             let juego1 = Juego(mano: cartasJugador1)
             let juego2 = Juego(mano: cartasJugador2)
             
-            let nombre1 = nombre1 ?? "Jugador 1"
+//            let nombre1 = nombre1 ?? "Jugador 1"
             let nombre2 = nombre2 ?? "Jugador 2"
             
             let jugada1 = juego1.verificar()
@@ -100,7 +100,7 @@ class PokerViewController: UIViewController {
             let puntaje2 = juego2.puntaje()
             
             if puntaje1 > puntaje2 {
-                mostrarGanador(titulo: "¡Ganador!", mensaje: "\(nombre1) ganó con \(jugada1)!")
+                mostrarGanador(titulo: "¡Ganador!", mensaje: " ganó con \(jugada1)!")
                 stack1.backgroundColor = UIColor.systemGreen
                 stack2.backgroundColor = UIColor.systemRed
             } else if puntaje2 > puntaje1 {
@@ -117,7 +117,7 @@ class PokerViewController: UIViewController {
     func tocame(){
         let thirdVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ThirdViewController") as! TocameViewController
             
-            thirdVC.nombre = eti1.text
+//            thirdVC.nombre = eti1.text
             
             self.show(thirdVC, sender: nil)
     }
