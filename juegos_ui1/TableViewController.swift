@@ -18,6 +18,7 @@ class TableViewController: UIViewController, UITableViewDelegate, UITableViewDat
         tableView.dataSource = self
         tableView.delegate = self
         cargarMejoresPuntajes()
+        
     }
     
     struct EntradaHistorial: Codable {

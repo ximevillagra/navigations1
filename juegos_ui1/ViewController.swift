@@ -12,16 +12,17 @@ class HomeViewController: UIViewController {
     
     
     @IBOutlet weak var txtfldPick: UITextField!
-    @IBOutlet weak var user2: UITextField!
-    
     
     @IBOutlet weak var selectJuego: UIButton!
     
     
-    let juegos = ["Poker", "Tocame", "Generala"]
+    let juegos = ["Poker", "Tocame", "Otro"]
     var juegoSeleccionado: String?
     
     var pickerView = UIPickerView()
+    
+    var nomUser: String?
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,8 +33,6 @@ class HomeViewController: UIViewController {
         txtfldPick.textAlignment = .center
         txtfldPick.clearButtonMode = .whileEditing
         
-        user2.clearButtonMode = .whileEditing
-        user2.isHidden = true
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tap)
@@ -46,7 +45,6 @@ class HomeViewController: UIViewController {
         
         toolbar.setItems([flexSpace, doneButton], animated: false)
         txtfldPick.inputAccessoryView = toolbar
-        
     }
     
     @objc func dismissKeyboard() {
@@ -55,23 +53,26 @@ class HomeViewController: UIViewController {
     
     
     func navegar() {
-        guard let juego = txtfldPick.text, !juego.isEmpty else { return }
+        guard let juego = juegoSeleccionado else { return }
         
-        if txtfldPick.text == "Poker" {
-            guard let secondVC = storyboard?.instantiateViewController(withIdentifier: "SecondViewController") as? PokerViewController else {
-                return
-            }
-            user2.isHidden = false
-            secondVC.nombre2 = user2.text
-            secondVC.juegoSeleccionado = juego
-            present(secondVC, animated: true, completion: nil)
-        } else if txtfldPick.text == "Tocame" {
-            guard let thirdVC = storyboard?.instantiateViewController(withIdentifier: "ThirdViewController") as? TocameViewController else {
-                return
-            }
-            user2.isHidden = true
-            thirdVC.juegoSeleccionado = juego
-            present(thirdVC, animated: true, completion: nil)
+        if let nombre = nomUser {
+            UserDefaults.standard.set(nombre, forKey: "usuarioActual")
+        }
+
+        switch juego {
+        case "Poker":
+            let pokerVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SecondViewController") as! PokerViewController
+            pokerVC.nombre1 = nomUser
+            pokerVC.juegoSeleccionado = juego
+            self.show(pokerVC, sender: nil)
+
+        case "Tocame":
+            let tocameVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ThirdViewController") as! TocameViewController
+            tocameVC.nombre = nomUser
+            self.show(tocameVC, sender: nil)
+            
+        default:
+            break
         }
     }
     
@@ -81,29 +82,50 @@ class HomeViewController: UIViewController {
         txtfldPick.text = selectedJuego
         juegoSeleccionado = selectedJuego
         txtfldPick.resignFirstResponder()
+    }
+    
+    @IBAction func buttonAction(_ sender: Any) {
+        navegar()
+        print("Intentando navegar a: \(txtfldPick.text ?? "ninguno")")
         
-        if selectedJuego == "Tocame" {
-            user2.isHidden = true
-            UIView.animate(withDuration: 0.3) {
-//                self.selectJuego.frame.origin.y -= 100
-            }
-        } else {
-            user2.isHidden = false
-            UIView.animate(withDuration: 0.3) {
-                self.selectJuego.frame.origin.y += 100
-            }
+    }
+    
+    func verTopCinco() {
+        //func para tabla con el top 5 del userrrrrr
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        if let UserTopVC = storyboard.instantiateViewController(withIdentifier: "UserTopVC") as? UserTopViewController {
+            self.present(UserTopVC, animated: true, completion: nil)
         }
     }
-
-}
     
+    @IBAction func btnTopUser(_ sender: Any) {
+        verTopCinco()
+    }
+    
+    func showHelp(message: String) {
+        let alert = UIAlertController(title: juegoSeleccionado ?? "Juego", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+
+    @IBAction func btnHelp(_ sender: Any) {
+        if juegoSeleccionado == "Poker"{
+            showHelp(message: "Te enfrentarás a la computadora. Se les serán repartidas 5 cartas a cada uno una vez le des click a 'Jugar', observa con qué jugadas ganas.")
+        } else if juegoSeleccionado == "Tocame" {
+            showHelp(message: "Verás en la pantalla un círculo de color morado. Tendrás 20 segundos, persigue al círculo clickeándolo y suma puntos.")
+        } else {
+            showHelp(message: "Utiliza la barra de opciones para elegir un juego.")
+        }
+    }
+    
+}
 
 extension HomeViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return juegos.count
     }
-        func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         return juegos[row]
     }
     
@@ -113,14 +135,6 @@ extension HomeViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         txtfldPick.text = juegos[row]
-           juegoSeleccionado = juegos[row] 
-//           txtfldPick.resignFirstResponder()
+        juegoSeleccionado = juegos[row]
     }
-    
-    @IBAction func buttonAction(_ sender: Any) {
-        navegar()
-        print("Intentando navegar a: \(txtfldPick.text ?? "ninguno")")
-
-    }
-    
 }

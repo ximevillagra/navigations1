@@ -7,6 +7,14 @@
 
 import UIKit
 
+//para guardar registros
+struct Usuario: Codable {
+    let nombre: String
+    let email: String
+    let password: String
+}
+
+
 class RegisterViewController: UIViewController {
     
     @IBOutlet weak var regNom: UITextField!
@@ -25,32 +33,36 @@ class RegisterViewController: UIViewController {
               let email = regEmail.text, !email.isEmpty,
               let pass = regPass.text, !pass.isEmpty,
               let confirmPass = confPass.text, !confirmPass.isEmpty else {
-            mostrarAlerta(titulo: "Campos vacíos", mensaje: "Por favor, completa todos los campos.")
+            mostrarAlerta(titulo: "Campos vacíos", mensaje: "Completa todos los campos.")
             return
         }
-        
+
         guard pass == confirmPass else {
             mostrarAlerta(titulo: "Contraseñas no coinciden", mensaje: "Verifica que ambas contraseñas sean iguales.")
             return
         }
-        
-        // historial de nombre, correo y contrasena
-        let nuevaEntrada = ingresaPass(password: pass)
-        contrasenas.append(nuevaEntrada)
-        
-        if let encoded = try? JSONEncoder().encode(contrasenas) {
-            UserDefaults.standard.set(encoded, forKey: "contrasenas")
+
+        var usuarios: [String: Usuario] = [:]
+        if let data = UserDefaults.standard.data(forKey: "usuarios"),
+           let cargados = try? JSONDecoder().decode([String: Usuario].self, from: data) {
+            usuarios = cargados
         }
 
-        print("Nombre ingresado: \(nombre)")
-        print("Correo: \(email)")
-        print("Contraseña: \(pass)")
-        print("Confirmación: \(confirmPass)")
-        
+        if usuarios[nombre] != nil {
+            mostrarAlerta(titulo: "Este usuario ya existe", mensaje: "Ese nombre ya está registrado.")
+            return
+        }
+
+        let newUser = Usuario(nombre: nombre, email: email, password: pass)
+        usuarios[nombre] = newUser
+
+        if let encoded = try? JSONEncoder().encode(usuarios) {
+            UserDefaults.standard.set(encoded, forKey: "usuarios")
+        }
+
         alertaLogin(titulo: "Registro exitoso", mensaje: "Bienvenido \(nombre)!")
-        
-        print(contrasenas)
     }
+
 
         
         
@@ -62,17 +74,20 @@ class RegisterViewController: UIViewController {
          present(alerta, animated: true, completion: nil)
      }
 
-     func alertaLogin(titulo: String, mensaje: String) {
-         let alerta = UIAlertController(title: titulo, message: mensaje, preferredStyle: .alert)
-         let okAction = UIAlertAction(title: "Ir a Inicio", style: .default) { _ in
-             if let loginVC = self.storyboard?.instantiateViewController(withIdentifier: "LoginVC") {
-                 loginVC.modalPresentationStyle = .fullScreen
-                 self.present(loginVC, animated: true, completion: nil)
-             }
-         }
-         alerta.addAction(okAction)
-         present(alerta, animated: true, completion: nil)
-     }
+    func alertaLogin(titulo: String, mensaje: String) {
+        let alerta = UIAlertController(title: titulo, message: mensaje, preferredStyle: .alert)
+        
+        let okAction = UIAlertAction(title: "Ir a Inicio", style: .default) { _ in
+            if let loginVC = self.storyboard?.instantiateViewController(withIdentifier: "LoginVC") {
+                loginVC.modalPresentationStyle = .fullScreen
+                self.show(loginVC, sender: nil)
+            }
+        }
+        
+        alerta.addAction(okAction)
+        present(alerta, animated: true, completion: nil)
+    }
+
     
     @IBAction func btnRegistrar(_ sender: Any) {
         registrar()
@@ -80,17 +95,20 @@ class RegisterViewController: UIViewController {
     
     
     
-        override func viewDidLoad() {
-            super.viewDidLoad()
-            regNom.clearButtonMode = .whileEditing
-            regEmail.clearButtonMode = .whileEditing
-            regPass.clearButtonMode = .whileEditing
-            confPass.clearButtonMode = .whileEditing
-            if let data = UserDefaults.standard.data(forKey: "contrasenas"),
-               let allPasswords = try? JSONDecoder().decode([ingresaPass].self, from: data) {
-                self.contrasenas = allPasswords
-            }
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        regNom.clearButtonMode = .whileEditing
+        regEmail.clearButtonMode = .whileEditing
+        regPass.clearButtonMode = .whileEditing
+        confPass.clearButtonMode = .whileEditing
 
+        // Imprimir usuarios guardados para prueba
+        if let data = UserDefaults.standard.data(forKey: "usuarios"),
+           let cargados = try? JSONDecoder().decode([String: Usuario].self, from: data) {
+            for (nombre, usuario) in cargados {
+                print("Usuario: \(nombre), Email: \(usuario.email)")
+            }
         }
+    }
     }
 

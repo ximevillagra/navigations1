@@ -159,9 +159,6 @@ class TocameViewController: UIViewController {
 
     }
     
-    
-    // ir a tabla
-    
     @IBAction func mostrarTabla(_ sender: UIButton) {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         if let tableVC = storyboard.instantiateViewController(withIdentifier: "TableVC") as? TableViewController {
@@ -175,4 +172,16 @@ class TocameViewController: UIViewController {
         sender.setTitle("Reintentar", for: .normal)
         reiniciarJuego()
     }
+    
+    func guardarYMostrarHistorial() {
+        if let encoded = try? JSONEncoder().encode(historial) {
+            UserDefaults.standard.set(encoded, forKey: "historial")
+        }
+
+        print("Historial completo de puntajes:")
+        for entrada in historial {
+            print("\(entrada.nombre): \(entrada.puntaje)")
+        }
+    }
+
 }
