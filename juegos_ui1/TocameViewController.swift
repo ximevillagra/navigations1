@@ -13,9 +13,10 @@ class TocameViewController: UIViewController {
     @IBOutlet weak var viewCaja: UIView!
     @IBOutlet weak var player: UILabel!
 
-        
+
+    
     var countdownTimer: Timer?
-    var restante = 20
+    var restante = 30
     var contador = 0
     var circle: UIView!
     var nombre: String?
@@ -30,6 +31,7 @@ class TocameViewController: UIViewController {
         player.text = nombre
         super.viewDidLoad()
         setup()
+        self.navigationController?.navigationBar.tintColor = .purple
     }
 
 
@@ -101,7 +103,7 @@ class TocameViewController: UIViewController {
         countdownTimer?.invalidate()
 
         contador = 0
-        restante = 20
+        restante = 30
         etiScore.text = "0"
         etiTimer.text = "\(restante)"
 
@@ -162,9 +164,11 @@ class TocameViewController: UIViewController {
     @IBAction func mostrarTabla(_ sender: UIButton) {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         if let tableVC = storyboard.instantiateViewController(withIdentifier: "TableVC") as? TableViewController {
+            tableVC.nombreJugador = nombre
             self.present(tableVC, animated: true, completion: nil)
         }
     }
+
 
     
 

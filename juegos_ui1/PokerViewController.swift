@@ -24,16 +24,14 @@ class PokerViewController: UIViewController {
     var nombre1: String?
     var nombre2 = "COMPUTADOR"
     var juegoSeleccionado: String?
-//    var nomUser = String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // Mostrar los nombres en las etiquetas
+        self.navigationController?.navigationBar.tintColor = .purple
         eti1.text = nombre1
         eti2.text = nombre2
 
-            // Opcional: mostrar en consola
+            // ignorar o borrar dps mostrar en consola
         print("Juego elegido: \(juegoSeleccionado ?? "Ninguno")")
 
         eti1.isHidden = true

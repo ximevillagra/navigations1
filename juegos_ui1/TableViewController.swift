@@ -11,7 +11,8 @@ class TableViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     @IBOutlet weak var tableView: UITableView!
     var mejoresPuntajes: [EntradaHistorial] = []
-    
+    var nombreJugador: String?
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,14 +29,19 @@ class TableViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     
     func cargarMejoresPuntajes() {
+        guard let nombreJugador = nombreJugador else {
+            mejoresPuntajes = []
+            return
+        }
         if let data = UserDefaults.standard.data(forKey: "historial"),
            let historial = try? JSONDecoder().decode([EntradaHistorial].self, from: data) {
-            let mejores = historial.sorted(by: { $0.puntaje > $1.puntaje }).prefix(5)
+            let historialJugador = historial.filter { $0.nombre == nombreJugador }
+            let mejores = historialJugador.sorted(by: { $0.puntaje > $1.puntaje }).prefix(5)
             mejoresPuntajes = Array(mejores)
         }
     }
+
 }
-    
     
     // El extension sirve para agregar mas metodos a nuestras clases
     extension TableViewController {
@@ -65,5 +71,3 @@ class TableViewController: UIViewController, UITableViewDelegate, UITableViewDat
             return "Mejores puntajes"
         }
     }
-    
-
