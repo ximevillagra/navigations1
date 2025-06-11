@@ -5,13 +5,29 @@
 //  Created by Bootcamp on 2025-05-29.
 //
 
+import Foundation
 import UIKit
 import Alamofire
-//para guardar registros
+
 struct Usuario: Codable {
     let nombre: String
     let email: String
     let password: String
+}
+
+struct SupabaseSignupResponse: Decodable {
+    let id: String?
+    let email: String?
+    let user_metadata: UserMetadata?
+    let error: SupabaseError?
+
+    struct UserMetadata: Decodable {
+        let username: String?
+    }
+
+    struct SupabaseError: Decodable {
+        let message: String
+    }
 }
 
 
@@ -49,16 +65,16 @@ class RegisterViewController: UIViewController {
         
         AF.request(url, method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
             .validate()
-            .responseJSON { response in
+            .responseDecodable(of: SupabaseSignupResponse.self) { response in
                 switch response.result {
-                case .success(let value):
-                    if let json = value as? [String: Any], json["error"] == nil {
+                case .success(let data):
+                    if data.error == nil {
                         DispatchQueue.main.async {
                             self.alertaLogin(titulo: "¡Registro exitoso!", mensaje: "Te registraste correctamente.")
                         }
                     } else {
                         DispatchQueue.main.async {
-                            self.mostrarAlerta(titulo: "Error en el registro", mensaje: "\(value)")
+                            self.mostrarAlerta(titulo: "Error en el registro", mensaje: data.error?.message ?? "Error desconocido")
                         }
                     }
                 case .failure(let error):
@@ -68,7 +84,6 @@ class RegisterViewController: UIViewController {
                 }
             }
     }
-
     
     func insertaNombre(id: String, nombre: String, email: String, apiKey: String) {
         let url = URL(string: "https://lvmybcyhrbisfjouhbrx.supabase.co/rest/v1/usuarios")!
@@ -90,8 +105,11 @@ class RegisterViewController: UIViewController {
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Error al guardar nombre en Supabase: \(error.localizedDescription)")
-            } else {
-                print("Nombre guardado correctamente en Supabase.")
+            } else if let httpResponse = response as? HTTPURLResponse {
+                print("Response status code: \(httpResponse.statusCode)")
+                if let data = data, let responseStr = String(data: data, encoding: .utf8) {
+                    print("Response data: \(responseStr)")
+                }
             }
         }.resume()
     }
@@ -147,4 +165,3 @@ class RegisterViewController: UIViewController {
         self.navigationController?.navigationBar.tintColor = .purple
     }
 }
-

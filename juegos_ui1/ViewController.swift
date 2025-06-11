@@ -5,7 +5,9 @@
 //  Created by Bootcamp on 2025-05-26.
 //
 
+import Foundation
 import UIKit
+import Alamofire
 
 class HomeViewController: UIViewController {
     
@@ -13,7 +15,7 @@ class HomeViewController: UIViewController {
     @IBOutlet weak var scrollViewSlider: UIScrollView!
     @IBOutlet weak var pageControlSlider: UIPageControl!
         
-    let juegos = ["Poker", "Tocame", "Otro"]
+    let juegos = ["Poker", "Tocame"]
     var juegoSeleccionado: String?
     var nomUser: String?
     
@@ -32,7 +34,7 @@ class HomeViewController: UIViewController {
     }
 
     func setupSlider() {
-        let images = ["pokir", "ball", "otro"]
+        let images = ["pokir", "ball"]
         print("ScrollView width:", scrollViewSlider.frame.width)
 
         scrollViewSlider.subviews.forEach { $0.removeFromSuperview() }
@@ -70,11 +72,12 @@ class HomeViewController: UIViewController {
 
     func navegar() {
         guard let juego = juegoSeleccionado else { return }
-
-        if let nombre = nomUser {
-            UserDefaults.standard.set(nombre, forKey: "usuarioActual")
+            
+        if nomUser == nil {
+            nomUser = SessionManager.shared.nombreUser
         }
 
+        
         switch juego {
         case "Poker":
             let pokerVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SecondViewController") as! PokerViewController

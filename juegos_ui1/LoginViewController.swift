@@ -5,7 +5,9 @@
 //  Created by Bootcamp on 2025-05-30.
 //
 
+import Foundation
 import UIKit
+import Alamofire
 
 class LoginViewController: UIViewController {
     
@@ -69,7 +71,7 @@ class LoginViewController: UIViewController {
                 
                 if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
                     if let token = json["access_token"] as? String {
-                        self.obtenerPerfil(token: token)
+                        self.obtenerPerfil(token: token, tokenObtenido: token, userId: email)
                     } else if let errorMsg = json["error_description"] as? String {
                         self.showAlert(message: errorMsg)
                     } else {
@@ -80,7 +82,7 @@ class LoginViewController: UIViewController {
         }.resume()
     }
 
-    func obtenerPerfil(token: String) {
+    func obtenerPerfil(token: String, tokenObtenido: String, userId: String) {
         let apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2bXliY3locmJpc2Zqb3VoYnJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1Mjk2NzcsImV4cCI6MjA2NDEwNTY3N30.f2t60RjJh91cNlggE_2ViwPXZ1eXP7zD18rWplSI4jE"
         let url = URL(string: "https://lvmybcyhrbisfjouhbrx.supabase.co/auth/v1/user")!
         
@@ -103,14 +105,31 @@ class LoginViewController: UIViewController {
                 }
                 
                 if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let id = json["id"] as? String,
                    let meta = json["user_metadata"] as? [String: Any],
                    let username = meta["username"] as? String {
-                    self.showAlertSuccess(message: "¡Inicio de sesión exitoso!", nombre: username)
+                    self.showAlertSuccess(message: "¡Inicio de sesión exitoso!", nombre: username, token: tokenObtenido, userId: id)
                 } else {
-                    self.showAlert(message: "No se pudo obtener el username.")
-                }
-            }
+                    self.showAlert(message: "No se pudo obtener el perfil del usuario.")
+                }            }
         }.resume()
+    }
+    
+    func showAlertSuccess(message: String, nombre: String, token: String, userId: String) {
+        let alert = UIAlertController(title: "Inicio exitoso", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+            self.guardarSesionYNavegar(nombre: nombre, token: token, userId: userId)
+        })
+        present(alert, animated: true)
+    }
+
+    func guardarSesionYNavegar(nombre: String, token: String, userId: String) {
+
+        SessionManager.shared.guardarSesion(token: token, userId: userId, nombreUser: nombre)
+        
+        let homeVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "FirstViewController") as! HomeViewController
+        homeVC.nomUser = nombre
+        self.show(homeVC, sender: nil)
     }
     
     func verTopTen() {
@@ -124,19 +143,5 @@ class LoginViewController: UIViewController {
         let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
-    }
-    
-    func showAlertSuccess(message: String, nombre: String) {
-        let alert = UIAlertController(title: "Inicio exitoso", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
-            self.irAHomeConNombre(nombre: nombre)
-        })
-        present(alert, animated: true)
-    }
-    
-    func irAHomeConNombre(nombre: String) {
-        let homeVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "FirstViewController") as! HomeViewController
-        homeVC.nomUser = nombre
-        self.show(homeVC, sender: nil)
     }
 }
